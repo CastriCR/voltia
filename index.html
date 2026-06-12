@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voltia | Smart EV Charging Network</title>
+  <meta name="description" content="Voltia ayuda a comercios a desplegar, operar y monetizar infraestructura de carga para vehículos eléctricos." />
+  <style>
+    :root {
+      --bg: #07101f;
+      --bg-2: #0b1629;
+      --panel: rgba(255,255,255,.06);
+      --panel-2: rgba(255,255,255,.09);
+      --line: rgba(255,255,255,.12);
+      --text: #f4f8ff;
+      --muted: #9fb1ca;
+      --green: #52e633;
+      --green-2: #2ddf58;
+      --cyan: #00d7c3;
+      --navy: #061326;
+      --shadow: 0 24px 80px rgba(0,0,0,.38);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(82,230,51,.13), transparent 24%),
+        radial-gradient(circle at 85% 6%, rgba(0,215,195,.18), transparent 26%),
+        linear-gradient(180deg, #07101f 0%, #08101e 50%, #06101d 100%);
+      line-height: 1.55;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container { width: min(1200px, calc(100% - 42px)); margin: 0 auto; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(7,16,31,.84);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .brand img {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      box-shadow: 0 12px 36px rgba(0,215,195,.16);
+    }
+    .brand strong { display: block; font-size: 1.08rem; line-height: 1; }
+    .brand span { display: block; color: var(--muted); font-size: .84rem; }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: .95rem; }
+    .nav-links a:hover { color: var(--text); }
+    .lang-switch {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px; border-radius: 999px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--line);
+    }
+    .lang-switch button {
+      border: 0; background: transparent; color: var(--muted);
+      padding: 8px 12px; border-radius: 999px; font-weight: 900; cursor: pointer;
+    }
+    .lang-switch button.active {
+      color: #04101a; background: linear-gradient(135deg, var(--green), var(--cyan));
+    }
+    .menu-toggle {
+      display: none; border: 1px solid var(--line); background: rgba(255,255,255,.05);
+      color: var(--text); border-radius: 12px; padding: 10px 12px; cursor: pointer;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 999px; padding: 14px 22px; font-weight: 900;
+      border: 1px solid transparent; transition: .2s ease; cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      color: #03111d; background: linear-gradient(135deg, var(--green), var(--cyan));
+      box-shadow: 0 18px 48px rgba(0,215,195,.18);
+    }
+    .btn-outline { border-color: var(--line); background: rgba(255,255,255,.04); color: var(--text); }
+    .btn:hover, .card:hover, .model:hover, .step:hover, .hero-panel:hover { transform: translateY(-2px); }
+
+    .hero { padding: 78px 0 42px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 9px 15px; border-radius: 999px;
+      background: rgba(82,230,51,.14); border: 1px solid rgba(82,230,51,.25);
+      color: #d6ffce; font-weight: 900; margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(2.6rem, 5.9vw, 5.2rem);
+      line-height: .95; letter-spacing: -.06em; margin-bottom: 24px;
+    }
+    .accent { color: var(--green); }
+    .hero p { color: var(--muted); font-size: 1.12rem; max-width: 670px; margin-bottom: 30px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
+    .hero-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .metric {
+      padding: 20px; border-radius: 18px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+    }
+    .metric strong { display: block; font-size: 1.35rem; margin-bottom: 6px; }
+    .metric span { color: var(--muted); font-size: .95rem; }
+
+    .hero-panel {
+      padding: 26px;
+      border-radius: 30px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: .2s ease;
+    }
+    .product-dashboard {
+      padding: 22px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 86% 0%, rgba(0,215,195,.15), transparent 32%),
+        radial-gradient(circle at 10% 20%, rgba(82,230,51,.09), transparent 30%),
+        linear-gradient(180deg, #0e1a30 0%, #0a1426 100%);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .dashboard-topbar {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 14px; margin-bottom: 16px;
+    }
+    .mini-label {
+      color: #caffbd; font-weight: 900; font-size: .78rem;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .dashboard-topbar h3 { margin-top: 6px; font-size: 1.35rem; letter-spacing: -.03em; }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px;
+      color: #04101a; background: linear-gradient(135deg, var(--green), var(--cyan));
+      font-weight: 900; font-size: .86rem;
+    }
+    .live-badge::before {
+      content: ""; width: 8px; height: 8px; border-radius: 50%;
+      background: #04101a; opacity: .75;
+    }
+    .dashboard-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 14px;
+    }
+    .stat-box {
+      padding: 15px; border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .stat-box span { color: var(--muted); display: block; font-size: .82rem; margin-bottom: 5px; }
+    .stat-box strong { font-size: 1.5rem; letter-spacing: -.04em; }
+    .dashboard-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 14px; }
+    .dashboard-card, .mini-card {
+      border-radius: 20px; border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.045); padding: 18px;
+    }
+    .dashboard-card h3, .mini-card h3 { margin-bottom: 12px; }
+    .dashboard-card p, .mini-card p { color: var(--muted); font-size: .95rem; margin-bottom: 12px; }
+    .map-box {
+      height: 220px; border-radius: 18px; position: relative; overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(82,230,51,.16), transparent 22%),
+        radial-gradient(circle at 76% 70%, rgba(0,215,195,.16), transparent 25%),
+        linear-gradient(180deg, #0b1729, #07101e);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .map-box::before {
+      content: ""; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .pin {
+      position: absolute; width: 16px; height: 16px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      box-shadow: 0 0 0 7px rgba(0,215,195,.16);
+    }
+    .pin:nth-child(1){ top:22%; left:22%; }
+    .pin:nth-child(2){ top:56%; left:38%; }
+    .pin:nth-child(3){ top:40%; left:78%; }
+    .pin:nth-child(4){ top:68%; left:60%; }
+    .list { display: grid; gap: 10px; }
+    .item {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 14px;
+      background: rgba(255,255,255,.045); color: var(--muted); font-size: .92rem;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+      background: linear-gradient(135deg, var(--green), var(--cyan)); margin-right: 10px;
+    }
+    .status-ok { color: #baffcc; font-weight: 900; }
+
+    section { padding: 42px 0 24px; }
+    .section-head { margin-bottom: 26px; max-width: 780px; }
+    .section-head h2 {
+      font-size: clamp(1.8rem, 3.2vw, 3rem);
+      line-height: 1; letter-spacing: -.04em; margin-bottom: 12px;
+    }
+    .section-head p { color: var(--muted); }
+
+    .cards, .models, .steps {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+    }
+    .card, .model, .step, .benefit-box, .platform-box, .cta-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border-radius: 20px;
+    }
+    .card, .model, .step { padding: 22px; transition: .2s ease; }
+    .icon-badge {
+      width: 46px; height: 46px; display: grid; place-items: center;
+      border-radius: 14px; background: linear-gradient(135deg, rgba(82,230,51,.18), rgba(0,215,195,.15));
+      margin-bottom: 15px; font-weight: 900;
+    }
+    .card h3, .model h3, .step h3 { font-size: 1.08rem; margin-bottom: 10px; }
+    .card p, .model p, .step p { color: var(--muted); font-size: .95rem; }
+    .split { display: grid; grid-template-columns: .95fr 1.05fr; gap: 18px; }
+    .platform-box { padding: 26px; }
+    .platform-box h3 { font-size: 1.35rem; margin-bottom: 12px; }
+    .platform-box p { color: var(--muted); margin-bottom: 18px; }
+    .platform-list { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    .pill {
+      padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08); font-weight: 800;
+    }
+    .model strong, .step .num {
+      display: inline-flex; justify-content: center; align-items: center;
+      width: 34px; height: 34px; border-radius: 11px;
+      color: #04101a; background: linear-gradient(135deg, var(--green), var(--cyan));
+      font-weight: 900; margin-bottom: 14px;
+    }
+    .benefits { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
+    .benefit-box { padding: 24px; }
+    .benefit-box h3 { margin-bottom: 14px; }
+    .checklist { display: grid; gap: 12px; }
+    .checklist li { list-style: none; color: var(--muted); padding-left: 28px; position: relative; }
+    .checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 900; }
+
+    .cta { padding: 54px 0 80px; }
+    .cta-card { padding: 24px; display: grid; grid-template-columns: .95fr 1.05fr; gap: 18px; border-radius: 28px; }
+    .cta-side {
+      padding: 28px; border-radius: 22px;
+      background: linear-gradient(135deg, rgba(82,230,51,.13), rgba(0,215,195,.13));
+      border: 1px solid rgba(255,255,255,.08);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .cta-side h2 { font-size: clamp(2rem, 4vw, 3rem); line-height: .98; letter-spacing: -.05em; margin-bottom: 14px; }
+    .cta-side p { color: var(--muted); margin-bottom: 22px; }
+    .contact-form {
+      padding: 22px; border-radius: 22px; border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+    .field { display: grid; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    label { color: var(--muted); font-size: .9rem; }
+    input, select, textarea {
+      width: 100%; border-radius: 14px; border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05); color: var(--text); padding: 14px; outline: none;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .form-note { color: var(--muted); font-size: .9rem; margin-top: 14px; }
+
+    footer { border-top: 1px solid rgba(255,255,255,.08); padding: 24px 0 42px; }
+    .footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; color: var(--muted); }
+    .footer-brand { display: flex; align-items: center; gap: 12px; }
+    .footer-brand img { width: 38px; height: 38px; border-radius: 12px; }
+
+    @media (max-width: 1020px) {
+      .hero-grid, .split, .cta-card, .dashboard-grid { grid-template-columns: 1fr; }
+      .cards, .models, .steps { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 860px) {
+      .menu-toggle { display: inline-flex; }
+      .nav-right {
+        position: absolute; top: calc(100% + 10px); left: 20px; right: 20px;
+        display: none; flex-direction: column; align-items: stretch;
+        padding: 18px; border-radius: 22px; background: rgba(7,16,31,.98);
+        border: 1px solid var(--line); box-shadow: var(--shadow);
+      }
+      .nav-right.open { display: flex; }
+      .nav-links { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .hero { padding-top: 52px; }
+      .hero-metrics, .dashboard-stats, .cards, .models, .steps, .benefits, .platform-list, .form-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .container { width: min(1200px, calc(100% - 28px)); }
+      .hero-actions { flex-direction: column; }
+      .btn { width: 100%; }
+      .brand span { display: none; }
+      .hero-panel, .product-dashboard, .platform-box, .cta-card, .cta-side, .contact-form { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="#top" class="brand">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAA3qklEQVR42u19ebBuWVXfb+19vuEOb+h+3TQ9Awp0iQJKgEakW8pUNC2FKBUTB6IpjTExxlSsmFTpH3FKIRhBZLCgQYZoN4Mg2DYKKKIStRWZ0k3T8/jo1/2633t3+oZz9l7540xrrb3Pd283jUlKbnG5r+/9vvOds/faa/it31qLADC++vUP9qv4+/soav8HRv/z/9uvx/MhyFxX/+MrvStfiU+i/qH4qwrmKyAd/48KAFFzNVYf4UdTFKM1+PE6nB+B3AiuGIGcBxggov5QEan31jfIAHNzac6sT/O6RNgIIK7fwixeS/U12/vk+r0Mrq9EYuGbz63vi+vPYL037e+ImtsjvbDEzTN0L0BzrfafERwrcKwQwxKxWiBWC4RqDnD8ym7Z43I19WCAH69junEM441zMJochh9Nm4133eIzi8UkEptT/04KA4OVapQbTY3QsdxMcPNeane3f48SMHR/Y4h7EZ+n7oO5v55aPO7kSwtp+5vm78nzsDjhrO4pxgocSsRqhnL2CMrZKYTl7uO/dV/eVZScY3roPKyfdRHWNs+FH00RY4VQLhFChRiDOFGcnC4CNUIRzScQmMzJJ9e8PQ6bGLL2lPSJF+vOzJ326jQDt7LSClLshYhZK4Hm/iNHrYW617FQGCTupvlXK1itBiWAyMG5otaU5ACOqBbbWGx/CeXuQ2AOj8sWPvZ3i1O/fuQCbJ77tRivnQXmiFAuEEIJjkEsCKn39qdFHMpuLTh5S/t7IgKIuuu2AtOrdaFJ2gtQbx56U9FLgJQTVpslzia3KpsznqDWTqlMpkvcmxJ5jdj9ihG7t5Fz8K6AH40B8ojVDIut+7Hc/lLz/F/GNj6mdzabP5ocwpHzn4H1w09EFUpUy1l90lmeOK0lWO569+/hNW23sj7tWh1zRlCs9uisAFgJnVLFtGLz7d+bBddChE7V93+zat0KdK8bSKxJK9DM3GmM3oQwiBz8aApfjFHNtzA7dQeq+em/fw2wcfalOHr+MwB4LBe7iKFqpLV1yPKxU//7+qNJOFztQ3NWU8R+CxlSgTZqlbUNbt4rla065Z3RJiEI3AmcimCIlL8g/0ydNuJkc5PnVsGRvU6vYfr1a5+RjO/DIOdRjKZw5DDfug/z03c9pi19DAJAOHr+1+PQuU9BudhDuVz0zhjQe9IZ0ZdbJtV8v3Gt1y69cX1i5eL0T9AKAIO53hAZTUhlU58weRypFwj1YvkZpDefuTdDwhRy/yHKEe2vnwnplAMr/RxWltAKFXMECCj8GH60hnL2MGYP3wKO1aPa1kclAEQeZ130jVg/eiGW821UZVmfeHKJp03GfnahlXaXs7iBdbBYHV8e1CosdTYpPSOiC5bvbO6pW+XuGunm5aMQ5ceZv7fy0T+QlWhzN0KAhsJbTtaB4ZxHMV5DXO5h9+TN4LA48NYeUAAIRISzL34O1o6cj8XeVm3ryXWbBBFH2+CmPtGdeyu9un6ROlXNZsFaj9wlp5elbVcahbR/ZZy3fhH7z1F220QP3JkU1sKIDOwhBUSocXkowPo522dQJkSsSa9hasHs8YXebyAAxWQTsZxh7+RN4LA80KF2B3L4wDjrwmdj/egFWOydqT+QXL3MQmVK1c9Kus3iMEsN3G08i5i9ex33Ko8HELLWFpPdfBVv6wVmrV9TzcLG1DCr27ZPTNAajZpDAyIDbpn16JGE3pHsMIw+DOUOT8gICwORgXKxC1dMsXbsaSDyj4MANCf78LlPw+bZl2Kxt40Yow6fulMpPWvukDN50rmLglk5agzSG2+cMBaCw00kwU30QNpHQ++PsRQr5Yd0jiNHIHLm9LMOKYkMgMTdPXAOnIK9hnb+uNMk1KEMHRrJMqKQKpqU0NfIhDhojRYrl3twow1Mjj4ZK0OkfZNBzeZP1o/hyBMvw3KxiyqUcC0kmnFodIhlT2HmVlie+mSpaoPCnLFZ7Wkk43lriyZNQ0RUUUFjmxpAiDQoJJ+JM167MRVS5VODavaX6YEOFs8row2yYsIaKoKNMqS0W0c0RlTLGYq1YyiW26h2T6y09Cs1ADmPIxd8PWIoUS7ncOQ6SVTySJQAPYkVEc41q1O92u+AOX16I9jEzGKxxSO3n8MsId2oPXcVs0cF6Mgwr/1/UrgGFM7Rnu72dPKAWcuBQ1KrKNMg9ptjNNA2q8XmGFFVc4wPXQhXTFe6eS5/+GuJ2jj7yRhND2Ox2BOHhFOMqz05Mk5tbwbibwKNA9ukDZnzJdSgNL6sBYetXWfhIDFUiEqJg0Ym+uLUW1fQdCoIRtQyv2vMnjzFpJ+PYULBHJCUnoWM0ypluAKRw/jQRStNgRuSRFdMsXH2k1At52Bh96EkGslmaccrda44o2ZTNcipM8lp2KQWq1OzsbOJ8jN677n3R6Tj1d8XJwAekiwl+rwFRxM12GdjKWt2IcRzIAsmUeLw8nDGuMsp1NhIrJbw06Pw48MZ2HpIAJoHXT/rEjg/QVXOV8Da0g4JJ4YAzlg47pU/ZD5NOn/UHxGlNnVUQYlqtjY0/XzeJ+LlToVH6cBZm95ch6Ssd5GEwDpkxJBzbsmmzzl7R7wfD4B1uCk/p4blgdHmEwdzEi5z/EGuwPqRCxCqRXf6aT9SgnKAYo3qMesNlieMc9cinWTlnPaSfjF1mgHalxOpXZHyzbFtVPTRQNPMDT5vTpbiDvThHqRGaaIiGdbqlDRrBzlL/NBagk3omrzfro9wqGMs4cabcMXaAUxAs2CTjWPwozWEsKxz+GT8gxV5LuqAmWjCOk632Z6MzkZTqtkSCLXXIx3YxGaT2nuQ4Z1A6Zh1qNbeDyUeOVRcTjLLKEJfDQLJKCETVZhnAMmYv3cmUxJMDzUzSwecEmYBA4ghAHDwa2dnBa3I7ebk0Hn1YsRQw7y5nLpExcjqiCZKZYu4WXAlp+L6ZL108EigjSmJgpBifdz4b2l+niw3ADHjhfQqnTpsnoUAsBGO2L0+iqhEaos0lM3lHxpndZBSRyJxZP2iFE1kBmKo4MeHUeJ4cmQLq8fJeYymRxGqZSfVsYuuOHU8qU2+cH/+FS+KG04UydynRtUU7YpM1lCGctyDSYa2BbJOJitUkFVSCgmLSCJwnOT8++sS9RiIZiq174tpZME6NJb5hXZJOKchjcmTiTYyKWzrKEo0hbmCK6ZwxRSxmg2ZgPotxXgDvpjU6V3hOQ9GHaxTukiAmzpZRERZ9pOU4N7hQ94eEtnkrkDWGDFGkS9QeyN0UyOsxFpvEPLOImsssSWmsKCSKRiXYehrMjfFxq6314qJyWPjJ5G9xQGEMOtMxhq6d6ONRFic9UGKyaEm8RIyIAXSeNzYXIVQZfB1qVZl/EskkLuBOLjDESiNAnR8b9QnD7FxkCd1sMm4KVIpa4zCJL9X+0ekYKR87iEviJZGZwEo5aNkuLnMDDda3z8KKMYb3SZ0LgkNnW6BuSuHjrIIVw/cS9klHUUlG4FMMEQKzVP3Q6wSOZxk3pBAqvokUeKQs1D3lFCFpAMJDfQw0px/LuzutOM+iVmLgwwAT8qACHyEikkimoUVVz9e7+1hS5QU8S3nMGlLsyLDAQASwsSq89Ll5K2j2PqHCgCyV6CWDW78CR3aMXT6WPoS2TCN9bOxxA6ML2xPcg1CEXhAPagjwam9zzp63VpAmLMcw7i9RACoSBjchX2l82NBNCQwceekcOIAiJQlsWHGSLuX92g1E8Z48l0wkJDp8vCtJWjkHDloKJobdalifU5dDwXpmo1kyQACpUAZSAuw+QwCVmrXIby04xdQb56JBvgMTb7YkQORB3M1EAWQg/Mjk9rUnP1eODTNeRDMZZNBIG2vWUWttL924P6hErY4UaJ6awydjLOZEx7eRwGzDGL0yZQZPxheITS1KyWPDGXqKIV+SQBcMu9CyB8sFe4y4FxHqc8KAIFArlD5kDYGT9SUpGdbdcz2YSlPuGiZDNSr7j7bRhneOKswjU3KlzPq0tLFUxVLSFjKnIoEN9EO72ufuVPNevNIw8b7IKtZsWCzlpyLYPpnltwHgA8ABDmnsOxO3MXD1YvQ+75N3kF7cWKlLAePBMiTkCisV58BQxIC55C+Rs8kak+NZR2zyDRqzj+noW4mzE0qlqRAJgFMykrqH4HyQE5WIHgojZHlYjCRgTq8ukKiASReTYKnx0xZcCRrIS35kqUT19fqkYi4ImQqmZJ0JwuAg21pFrPmAkLQtRmCuURGh1hvnY297pkPvWPKeXljY97ydJkMNHwwWiZj0EqIYhqxcqbgSEUc+zGCGJxsnLIlNsyh1vM2yQpByOREvfYPQNQyf0jYqLS+jpwDuIldiQCOiDEidnaXM7aTEv+CjbBIk6RIy8gRNoUJbhFHBzhP+aogwySiwQOUze9mjjjl0KAMHN7XTXZvy3ATizwi0T5oBDMpWqLODCGT/yaT8RIpak7DNiLCYj5DWdYsY45B3K/l1DcsWBCwXNSpzo11rK1NEEIcDIGyFUrQHH9ksYIMICuIMUS13prvOaAkwHEdaXXajtQBUKczMkYTArlMnj5bWWOyICpbnatGImSrrvYTgDr5Ywsktb/BK3SUdEP6k04aL2g0kXceW6fP4Ae+9yr86A/9cywWCzjX+BdklHVnxBxmsznuP/4lfPqzN+Mjn7gBd95yB9YOb8J7Qoz1a4gyNjND6lChZWJz2XgE3Dl33gOzPQdEwtOfUeHrnlvh0qcFHDrEcK7WCiJVCVHXBI7AeA1466unuPsWj/G6IB4pD58yQaA1lWTMDu2jTfYVANK5C8uFpg5s046MigjyUazwGDuMuhiNcPOtd+GKF35TEqIc5OuRR07hjW/5bbzyNW/DcrHEeDJBZEkaNb0Aco4V65ghDaWkJWT4Atg7Q3jKZYzv+4ldPPPyEuO1iMhArOoFciTJLT18HLne/Dtv9Hjwfgc/7rkUKYSQRi89kkoZwijl94yHaSUewH/rYQCPtaOXdFKuyrNkJZ4KC9O6eB7ykmQ00QjQdDrB7V+4FWcdO4rnP/fZWDalZjFGxBAQIyNyRAyNvY8BkRkhRHCM2NjcwBXf8jy86AXfhA9e9zHszebw3g9Eamw4DTRQnGSzjRIoA2ZbDi/69oCfee0OLn56hcWcsJw5LOaEsgKqkhCWDtWS6u+SUJVAWRKWM8J4AvzWq9Zw22cKjDcBjjTgBrAQIBExmCSRhVEo43MwAOcc4vwUOJbdX1w2bLKVtCYzZXPc0bJVbDxOudRm/UQhVBgfPozXv+UabG9tYzQawZGDdw7e+/rbOXjfftf/XTT/HUPAcrHEi174XLz7Ha8FyXtRlDIdbjJnsnjJKdGcQe+B2RZw+bcF/NSrdoEiYPd0U5DiGb6I8I7hHYNcBLkI52JvEhCxfijits97/PXHJxgfIcRAB/L/SZgfm9vglNNjALY8CDVACYsJE4WtORL0pqzlEQiZZf2QgXUjM9bXp7jti7fj6ne+F845hBgG7Fgul0IYjQosl0u8+MrL8R/+7Suwd2oL3jnjPrEmaLBh5FiomzUlyznGYo9x0VOAH//5PSzKgKokUFE/A1PsKA9MDEasNRciAgICR1SBQUXEH1w7wWLXwXvDfSKdN2GZ5aMcpNz4aTLHwikCy9mE0UA2kLsWLlFRulnYfbm5MKVKfcIvPV2mYLATiBgiJpubeN2b3olTp07D+0J7tbS/L+C9R4wRP/Mf/zUufNJFWMwXcBKgMqVg3FA/LeHExuss2MgcIn7op0usHwXmiwLsHCo4BCIEdgjsULFDGeufAQ4VE6pYf4/WCbd83uMvPzrGeDMiBJgOIiLNTPq/6x9Rn2jS2tUSzYfS4SsFgBSql1l8Nid8SGXRCoVG+t+RGdO1Ce6+41785luvgXOEEPlRdRpzRAgh4pxzzsJP/ti/wHJ7B+ScKdBCwlrvc/0CJNHqDM4x5luM577Y4RuuYJw+4wHn682HR8W+2/iy++mbf/vud/CED1+zhsUOwXk2vElOO5dIqjoEq6qzq9RskQ3BTZ0FPQoB6L16KMarTmCwwqMZmmDJuU5eymxYXiEjVAGTQ4fwhrdcg5MnH0FR+DqkexRf3hFijPjxH/0BPOWyr8F8bw/OtKPhpNhDpgd1gSoaTRgCMFkDXvKvgFlZn/aSHQJ7hFggcFELARyqSAix/llrAkIZHPyUcNuNBf76j8cYHQJi1RtEotWmLilHYU2vZ0Mz6SiiAgjigYPkhpEoMhvGCR8gAS14AArtfIGY2ClpaqbTCe6/+z684c3vqsOiaKuIV3+Rq7XAkSOH8J9/8odR7e7Bea/sv6IfZRE1qEpc7wnLbcbl3+Fw8bMI2zsegQpUXKDkQp34qlH9FdXC0WqFZSDAEz72njGWOw7exdRpVmsV0xzYSgY5GSHgNPTlR1EbWDOCJW9NJuxoJUjNqe+alG3pUrD+v6sQMD10GG+6+lqcOPEgvNQC+yqDWmi9d4gx4odf8XI88x99I2Y7O8InsXCkjmpYcPravENVMdaOEP7xKwrszqlT+SV7lMGhZEKJ+rSX0aNqTQJ8rSkiwU897vzCCDd8dITRJgvbn/oaSNwkEuU0ZDAL6roe5ppa1Zg3rbSi2TCwo1uxdYg4IVrkiRcaoNAMVX0abVQwno5x4v4TeO0b39FrgSEVQKlxJ6qdyul0ip/76R9BmM3qhpRdilR494Z8actKnQfKbeAFL3F4wlMJe7sOgTzKxrGrfzqE6BFQO32BXW0C2NWCEgu4scPH31dgsePgi5a3RxqzR6bETjHGqMfRDKPJBC1Z1JOS6w8KAOVVUy6MMzfeL24+6GiBJWYeyIkTQhUwPXIEV7/9vbjv/uO1FmDeP0UmCu2ddwgh4Hte9k9xxbddib2tHXhHnW1k2+lD+SjtBgFlyTh8LuHK759iZxfN5jtUjWNXO3+1/Y9wiI0A1L6AQxkc3MTh3ls8PvVRh9Em6rg/Ka4Z1u+caEwacNqgeizaugG2HviwCWCVkmVBLiRbisw5apTluPddMjref0smgaE2N78bj0c4+cBJvPYN78h24RoWhpa4SY399vj5//rvgFg16eauHYWhqad4hvOEaifi8peNceSSAnvzolbvsdn0WCDEoosA2t8HeETUAlGxQzFx+MS7gfkWwRcDOX1DplU1PknExcLJE35X00anL1rq15lWmGy3Mh1JloRBGVYqqQtTNm5EJkU7wIUjQggB0yOH8dZ3vA933X1vHePvFwoaHpp3DlUV8K1XXo6XvvSfYHZmF96TrkHAsDNVLhhnXTDC816+jp0dQkRRbzJqExDQeP2dqq9tfxDOoJ843HeLw6c/5jHaJLRF1gRKeiJn9QFzQrojIu2vkNGAskGxZE5R3pVyWVcqKX2VyR/KhiZ9HJ0BU5kTjuBgBryR6NGowOmHT+FXX/c2oQVWsSKGM2C/8LM/henaGFUVdDjKOSvJ9enfjXjh967j0AUFZnNCCddoAIcq1E5g6/D1zp/rvsvKw08L/MXvAvMzqG2/4RqkuEOmUVWGyax9BuNMSvtrax0z/QXcEBkkJR6sCAWHNoR7lZxSunRdHBt4OYSItSOH8c7ffj9uve3ODukbdARI+wEtOlhVFZ75DZfhB7/vpVicPoOi8AP6sL4vR0C5YJz7NR7PeukazmwBgYoO2KnYo6LG6WNfq3zyDRZQoIwFyuDhph73fZHw2Y9EjA4BoeJhLMVoRM4ikqyc15wCJRml2V7IOYlKBWCg122uwIE12jtkl+vCyyio08ikKm0JeZOrLgpsn9rGr7zmzX26dBXEqDKjpPyBn/svP4GzzjsX5WKpYQAyhe9EqOaM53/vEbijBRbLPqQLbXjXePxdyNc4gh0CGD147PFXHwiYn6mjCWTDYWgQl9OYSnnuKmVMWltk4c62veyBfQDTzCenZZX25Kwj1jpY0dycbsNqog3Z26e5TlUFrB09jGvecx1u+sIttRYI4WCwILehXB0RXHrJRfj3/+b7sTx9Bt77bMqaPGE5izj/6SNc9h2HsLNFiNQ6erWKD+y60y9VftV5/wBNPb50B+NzHykx2iCo3NYAUJY4gSTjfAP+p6FP1p1gZZrzVU9uiBPIQ6qebKlG2jbGnmQ2iAGbxszc9dVL0/SF99jb2sUrX/OWrsJG207a1xo5qiHi//STP4JLLnsqFrOFUSS9reSKcfkPnA1ad6iCQ6Aa76/VfdH8u6gx/tiggA0mEFD/N00KfOoDJRanGK7gDCuJdd8kxUkgaT1XYGCr1C9p2jsPZ1bdvqEVI+2jL507TnPPcqDCEEFSf0CELrakDiypQsTa0cN47/v+AJ/73E3whUcIIWEXrUKJiBxiiDh69Ah+9qd/DNX2NpxzoolETUZa7Fa4+NlTPOlbD2G24xBd0Zx632y867RBnQeovzsNEB3cdIQTd0Tc9OE5ig2I0z/Q7g6i2QPb5lM5l9rA18wDLpGlsTNyZfduP4SFpV9gSRTWEx2yz0R9XJpFDZGMYpFhkvcO890Z/vuvvdk4zPv1/Ol/tKbgh37we/C8b3kOZtu78N6pNLcjwvP+5fmovEcZ6lAvoFBqPsQ6EuhTvrVGiFygqjwwGeEzH5xhfprhChpohWdaPyXOFCnMYiX2buWdgFwPM+Y8o9PlCBaKip2BfZM4QTg3nLZiyMa6Ere0tAywzsiFELB29Aje/4Hr8bef+iyKokDIRgSZQhHqBSqGiMlkgn/23VeB9/a6PoTOEZY7AZdevoHzn38Y8x2qTz+aPH/n7NWxf9md+FoTRK4BIoxHeOjOiC/+0QzFhgNH2/VcklI4DQeTDaJ98uoZo88rPYT9cgH9W/IDGSg1O6yrY7rZF21b1wHNz0iri9ssGLMVxjrJU86X+OVffZMir2ZDVqSZFmaGLzzmsxneec37QevriCHUSx4jRtMRnvX9F2BRxv5kY9RFABG+A3/qCKD2D6o2GggObm2Mmz60g/nJCq4QEI4wo7aYhoThsz6N4i7aLsWyrDzJD5Ch4bWFMnE/AbCNHUztn2GBdvN+yFTQYP/+dmSaLpFS+6x76ICaiOAofv+6P8b/+qtPGVyAV+nDWiBDgHMO177vOnz+hk9jsrGGECPIAcutBZ78ok2c+6yj2N3mGsgJ9aZWoU7uRHaI7DvmT/9d/46mYzx8b4Vb/2gbxYbvciophM/GgSaDSKcV1AlfgDOdW7QkdEQRzpnqfbOByjvOtBhkgzcLk2H9AdkLJNs1xD6A6p+nJdsRIVRRaYEBPFHIQL1YznvM53O8+nVvhVs/3LW/C2XA2rE1fN0rLsQCEbQ2Bk3GwHgEHo+AyQhuOgH8CDE6cGPvY4f5E8pAwFqBL163hdlDJdyIbF15h8cm+RQVI5lZZHYQRWcWBENInfIBK7GiRW2RzSxJL56k3EYhtzJes2PZdI2hxaTrFC8Pup1IBkDUX1Ws0cE/vP7j+MSf/SWuvOIFqKpKEEA5mxwKIWA0GuHa9/webvrUZ7H2hPPqYRcEVPOAi15wDH5tAyduPAM/KuBEixzvC3CsMFkrUBwlhApgcs3ZqaMIP3Y4dW+JW68/Bb/u6+djakrQtDnS9bsYaIEv5gQNpTtyUUG7JYx8VTAdRAAk8UP17YlaKsl4qSJZnZ+vx7r4tOWyEQ3SldRjN4JJjX/xi696E6684gUrevH3GXDvPeazOV7162+DW99ArOoGCRwZxXqB+294GMf/5nTNl5eH0Dk4X2C5Ncc3/8xTcclV56CcL0GFNC0E2ixw6/UnMX+owviIRww6o5qqYB6YPKt1LZmDnzTUkHUgqmsYaZyFhp3BfKfQjEPShXM05JnKXH8UvDsdIfTXMdAmUbaoiaRJaE7z2pEj+JM/+ST+6KN/Cu/9QESALqfgnMP/vPb9+MKn/zfGGxt1ZpF7DcahbahYAPAAu/onHMrdEkeefAjnvPAJmO0AgUaoYpMZDB40nmDngYA7r38Qft11j51vZZ9pjZeFdvvuYrBpa049f9sYhGCLQ2gwJhjIBcSeDh5Fn7tcv9xsi7hcwyJOewgoxxNdLTvyaIGaowMAv/iqNyLG2MwwMKET9RjCbG+GV//61XBr6+AQkLTsIOprIgl1kSrVOHosAy696onA4TEWFTV5gJYX6IC1Ee768CnMT5Two15LqbGyEM22BCciqVBOOB6UJX5oweLOJ6Cccy1EgSj1m5IwkBJ/LtNGhU2IQyaKyMhgGmkgTYCwLsu2PaVazRRCwPTwIXzyz27AdR/+YzjfooNaqYbG83/n77wPt3zuZkw2N7rIwU7yyjVkqBYRmxet4wkvfiIWOxHRjRo+QA0ExdEIWycq3H39l+DXfNc4fHUrGkGOoTxwxVg1RyFH+FwV8WuI3j7nIBRMNEBZYt3XvisiaXsH5ToaKui4jYWjQKcELMqsfq99F1aXpmKEX3r1G1FVFZzz/Ri35rN8UWCxWOA1b3onRocOgVBjAd57FN7D+6LuOdDA0bIQhhwQZxUuuepijI+toyxJ1wAEB6xNcM8fPoS94zP4MSlHWKVgmVQxbbeFRp3rJpis1ytpl3+QlHhmwtm+YSAkYMFJnxs5HYRN3p8Nd0CWNtk2ZsxphtFqCTLekJw1EELAZHMdf/PJv8UHPvSHHdTbfn4MAUSE177+anzx7/4K5bLE3iNnMD/VfJ/ewvyRU1jO9pqxdxDqmxFKxtp5azj3xRdgvhsRnUeIrkH+RuBihJ0HA+67/jj8etGRVynXSEgMsWQMs5w171J3Rc+MoABlN48zoCAN0gmLvP9MdW1bzPAARDiITPdQeVZVnwPSoQ0LOjMLEjwRUqq+EmLqB1VFBo0n+O+/+pt42Uu+Hb7wIg1cJ+G3zpzGy17+cozXWvVfL12MEaPRCF/44u248abb4Majpg6BAOcQthc4/7svxei8wyi3FoAAnjgAo80Rjv/e7Zjdt4PRkUnPXk4mm8vDIGP3nHmEgo67gdp6lHmeNCpXndk0x+LBPpQrWsQ0XanFiSUgGaTYx5yczIJsxzVpgksfXqZdwDDUzAq6F2G9MBER081NfOaGz+Ldv/sh/OD3vRxlWaLwvsEbIn75F352JRb+S698PT53wy9hdM65qLjuTsJlwPTYGs6/6mlYzoHoRs1GNCDZyGHxSIUvXX8v/Foh2t+K6SQd/GudqpxPtCq9L1rfEOtD0goY5wgjNv4/aGEIc5YgQorDltbRyf73MN2ws/aou2HaN52bS/4R9R3N3HSKV/7amzGfL3qyR7NAIQRUVZV8L5clQgj4zOdvAkRvRHKEsLfEsSsvhL/4LCyWJKhgI1TBA5treOAj92F+3w7cpOibR9kBVwMsjZVj7yH5fL0mISMwnAysymdBIRtV0D4CYBuWp4ROVu3hunhecVloIHwhdQ9tokcxZHl/j5SUF00IMWCysY4b/+5G/M61H6jLyzvWUJ3i9c4l36OigPce99xzL1AUve4LjNHhCY5959MwnwUEVyBSSwQhxNEIs4eXOHn9XXBTX88dTFKuBscwa4rGxOrwNiXRGDqVuYYgEFCaD5OJtBWlNVoAhvvN6ulWNCRwqmk1rSxPZlVzZm2itJ2i/73B9ztzEBlubQ2/8tqrsbe3p7XAAFuMHGFrawvHHzwFFEX9O+9Q7Sxw9rc+CeOvPQeLWWwygE1NQOXAG2t48CN3Y37vFtzEp1pt5Sg8iFwAaUJLcgjk9BA5YjeFfsGruAK8kkkwwArWHTVymj+pVmVrNtLN7cfhZpoZMNRIqT6YsK3nUop45IjJxjpu+fzNePu73mu0AAY5ePcfP4GHHnoYflT3I+AAFBsFjl51GcrSIbgCS27z/wXCaIzZqRKPXH873LQAh8x8ABGnq5Mn4PG+6to6hcJekx7SQcOOvC7QlV3MEmLPQX0ATu24Kpy0cQaZQg/ivBOnRrZLSDQzZ2cozu26iOuqiBgZbn0Dr37dW7G9vVNrgQE72+bFb7/jLiy3d+uEjwPC3hKHv/kpGD/1PCx3Q23z4WshCIS4sY5HPnYnlveegRt7s+g2d5+ZRmozhOo10iEkzRQwoTcpcJdUqJkvMUkbeQz4AJkJPsya0NBtmmkaTSkffSi+N01ZesdISbOdwsGmfsDkw2LEZH2Ku75wB65++zV1Q6SYi5Z74bvl9ruAqqo7iUSGGxGOftczmsoer/mAoxHmp5c4c93N9emPnEn2k851tE8oCBqqF3L7hJQjgPVJt7Rhp/X6B0CFpsfjKifAZQ/aULcMWS8OmXlK2Tf5kSp2cKT0H0jbmgGACvanmCkYQoDbWMev/cbbcPr0GTjvNAvGXPaLt9zRIalhb4mN514C//TzsdwJiK7N+ReIwYE3N7D18TuxvOc0aOxNCZbRdJlpaG3k0ifBuC/rljOPsn2K7dg44/UNFPQq38xkBvICYEdx21WjNHPV+wxRUBpIjGuFGQ/DEqns8y/ZMR15QiVlu0bUJ2W8PsV9t96NN73lnb0WIF3Y4Br+wK233w0Uo3qaBjE2rnomAo26Eu+20jcWY5RnSmz//o1w05EJ5SmFYpP4GNk1VUKdC/mSVvuU310aoAom5Yd8AA2gohEy1yDdJ1iVf+l3cG6yF2NgsUwzJLbjk0W2i9iQh6hTuS3x0x/axG+86V14+OFH4Atfs39E4Yn3Hov5HPfcdxyYjBB3l1h/9sWYPOvJKLdLBDdq2MAFQkWIGxvY+fitqO5+GDQRsG/WH+OcQjDs7DyFjXIOudkLSoSH90FRHk0UQLLWn5KagmRujlDbnEO37IDnrCdqOg8QUonmTAZyQEiZgdF0ii/deS9e98a6sLTrMiIiiAdOPIQHTpwEFQU4Bqy/9DmoxhOEpsQ7oKhx/2KCcrvEzu9/DjQuejYTZ7ZuYD90KZr1Giiv9IbMOvapx2NdUp4kDldHAdQPirTt1USufYjMBciO2cnUCFWznlyboG+atIcLIqM8h0PeGAL84cN441uuwQMPtK1mNKPpzrvvxe7WDoqKMbrsQrhvehrKnQrBjTr6dwgOcWMDux+/GeGOB0HTkWbjqIpoTusmeOgg9KYsLbcXWo8N90KldjPOpzUTlm1+sCZRjJw46zHwEGlgTsEhMYHD0r302FVKr60TCQmtijmvfOWAicjAaDLByXuP47Wvv1qVl7c/b7v9HmBZwcWA8UueizBdq1u7UIEKNesn+hEWOyXm131anH5j1QaKMm3+PtfNUzlDvMrvsdqXTTu/1FjbvxEdJAowG5FMvB6YXpUdi2YneBMZXWh6DO83RiU3Yt3kGGQv4NBogTe//b24//gDTWFpHxHcfOttQFzCf815wOVPR7lTonKNA0hN6dfGOuZ/eiP49hPAdATEiCSPzStSlxYgJ20D5MR0okzsTEgKOxmr0nf5yKTnFByAEpZsMuWTRUlQIYYr5vsDYWWrkgPkg7JJ0G6AcsZDHk8mOHX8Ifzqa36zmz3QRQB33A2gBH3nNyNuHEZVoSn3rm0/j8YoZwHVh24AWtCHBwZZShibMsWYXTf1vBruDwcl5o4S71wXfHIuWuA8pW5/J5CNO5cZfmRnAGmKTma7TVNj1RlTxYEZv5WRSaUKFWecqtZ/aUmYIUQUhzfwlrf9Du686x5470EgVFWJO287DjzxYsTnPQ3VLKByo7q2nwpUgbBcW0f5iRuBOx8EpuMe+JEbTIIIK4dOZLvkcDfzWGIhZAKjNEyE4gIQacWgSKbMgiIsY4bhArGsCWBjz0ggWWQHJ0v2qlRpyLSOH0qcsAZDaFANiEGKNKQI+7KxyPU8gt1TNSmUiECOcPLUGdx/222g77oC4exzEBax6frRJH2KCZY7C4QPfhIYFV37uWFAnjI9cHNHkQSjTqJ5LZhFKtyjgUAzBYMAXWam8YhVyjZfHCo9ecs7MeNVdAsZ6IIQ1f3DTLyRo+dUSWmG+cqGFmbMb274IlFLHWMURw/j7b/127jpxi8AAO67636cnhRwV3wDwjwg+BEi16gfB0LcPAT8xU2g24/3tv8ApopV3kTjlraRcwf4cA4/R37US45AY0E8sn0aV88ncvvbXlZNInXpmIA+ITuL55y6NMNns4K237BKGfNwFmyojVzXLs4RZmf28CtNw6mb/vZTiFc+B7j0KYjzCkyjGvKFAxdj8O4S9KE/r8vDmFfUXGVMfYYGQgOtHrq2sCZpw1hRj5cbxpTscEoxGqqfcTlNxiLe56ThALILTkkMKgggZJM8mdg1QQCtC2DDU8pQFjid6wdGjAHF0bPw7nd/EPfdfS8eDBVwxXNB8wrsRmC4eq5uJPDmIeDPPg269R5gbQKKKwgqWUCPMsUe+yhiRjatrMBUMoRS2Wk1WzhCOg0/4AnokTHkMT50fpcyVWwdGu7IQsZfJdWfts1/D1en9Bk0Mowh6BrFpOaNTD+D/iZty9SiKLA4dQrL3T2cvuL5+JvpGK6q2b5dFyfngTLAv+EauO29ekSI5ap0eD1l0uArarBk5xOBlZCcHN6tAWUB4mSED5EZ4UkDzbXbXjkOvDgNxHIfEwBN0MCB25nncg40nKBYkbfo8H+ykT9lgS47rNA6kiEEuKNn4R3vuR7X3n4HsL6GEFGXgTEBZQQObYL+/FOgW+4Gr00058D6fxZZoYP08mAziM4cIM7FPJxH9jpfLaa1OBaQW9E+IUsIUWQN0XBwZehuMx7MZqCR8FtJNC20MTzZPKbUJqRNAAngwzCL2XTXrA+4w95shoff9YHavm9u1M2ByAHHjgInHoK79g+A6QQIMQvK61A25tlN9r6F88aZhBD3KdFshnlYqZjyOvBKU5UzQ8nUsPHmE3tHjYTeV/xDO9iZBtI7yNB5+xCnB9FoZSsTEuRTiHtg2KmclHyGLHdHBGgygrvnAfCtdwFPuhCY1PME6PO3wP2P3wLd/xAwqTF/WtGFjNnoIjM2tpdJ2d2T8uQZw5bK9HrMMIpohSZibTu7lzrEpTYBunOpG2HjvGc11bONxHLUSrUbtsxpWCJDQSJRR6CRMkowB2nFWRE+h8ipOXTS9k5Egkc0XjYRMFsAIw884WwgMHDiZO0DTIra8aN+SjoNfiYlUz7ZOgwtqYP6GEFPVSQBoazI8OXcZzKgWLbHkHy9Q9i+C1ztda/Ijo5tK4O6Nq9kRr+2kRn1Rqt35Fk5cFYd28nfA6BZHw4JNTZYTy+ZthnX3PY0JgawPqkLjB54pH7bdFr/OeruIvnx65yh3PTCIn/XRVXtIEjDAyU1pjtHHrHONg+Ew8PcL17hfheDAa3El4395QxmK71uK+X2xi2xKycBPMA9GiJScDbLBHNCxQDpNrwbF2b2rlYjnCnKUB9Cfd8e6UMpPECktplMD6YMm2IICWJrLDnflufAuRasaBfPg7ZvWEJr28eqFQpW53OEQ5QWjlKubm7w6fr6d4uA5zyMNuQkURRKCeACQYCFnqRGPf9BjxynVdwQzYlIGkJSguzJAg+siqZWdBSzOZyV2UDdtdu0fLFqPOO6D2L/nGa/tI/FKQpqUK6e4OkMR8a0qxUKuOUJUG7qOWUW0NBoGXp2oE2Bd7cYIzg3zjWP5yLf8jst8+EkBOUVB9A2yTLtaPevDpZ9bHsbT/v18SEk40W7hTdTMbuZyGTQg6a/QDuzOG2hnz9TbKtxjcAmtoRss+OoV5jzaWczOnUQa1GZQbGptpwrRXrNmDC2eX5bHWSubmoBU7SWDlIZFIXHyvnRVowkbz1oDgaBoygwBijOfyLlEiuQdDXLT1RaR4+qZzuUkYwnb08fUQpxk0YnGZxHQ0nk6ghGmFmnhjNCnPPHVNMIJSxkCDdYkf1vPtM0i3R5A086u8lSijJtrEnPuK3Trk703rFLnLYu144hGT+H8+lVAnJs2SEERY5zT1PT+6V6bShmFz/f8WeYsys8lFxDf2Em85GS0LDW/mdrMvNJM5eq05j08U0SCmSg1+Rw9bi3bDiVxBGcEkko7UWbLrqB/9EMS1LGo3PuyAzA4v03iDNTGznjrVu6LznxWaTPrQFx+gpniY+kZb5qg23obMJyMod4wEat8gEYMZSgYqRHu3BfvdNtLLGoaeLsKVHW0lGmqihVgSwIDWwAjiRSE15kL/TW7vEqp0ULORsTQBr8sk4qM4O6uH4Ah8j0RCALGAnAlRRupqujaYgWQCZpBsp+LnilCWgWMiwEWUGzgmy8nUz7UBMwew+UCDrPbVK8Xc0/9Dg3yunwrKPGenZ2DvmwfD4a6JxBQ5g7ZdVwbnCmEn07Lk85dpSe8oPZEN0ccAghVXwAB3DoOqAOAkG1ALgkZl6di+AUBFXAEK/siNF1smw7dqm2uGL6BWn6tzrPHZ5KCQjDmd46JCICzvAZaHBBWdh7ysOvquafjYkc7gmkNCbJzCblMh5IewvEFSeFAK6w77yAUO5l2u5LHECPhewrdrO5YDjDF8jlzNMKMUro5rlW64oUwpols2ryvA0xcycwH/ZKzJsyVb/G0xBUuB6UTLuBy3nFMJNZtC+SW8PM4RpoIsDVPHmBs7IXyz1wDM28Xc74Dtx3vTQnn9mOlgWGZmLm1ZwcOZMDf3mAhZAuFOcqJtmw7ziXL7f4hEnfsk7dSgfXZu6k7aYBraemfRvzmOUDECGd1UgpwJapT4giCTSoAWK1AJczOFekIZCQaOWgUX5eqOpOKUidg+39VwA+w+VwuRl8nO+kR7kqpIyGR4oKHgRaZ6SHVaKTLHMlvGrsU64LuFDrnIHGeXhUfH1YA1DNkuu63ApUi9PGDxDiqlqTpaeUs8AGG0IH5UMvkSkkpd7lKWEzCj4Hx/SMgdycwp6GnUKyqhuKik3svR7MV0utO+l2sJw7rLbYlM1GS/JoCrcnRX3Og8Os7oa+Xy4AAKrZKTAHwQfsp3hlHUI7Cp7axed8CXiuHSo4LUBRhAZKiks5F4lA2+Vs6R6bUIk1jTtNrZKea6iAlYyQkAZ4bJcVnRPmhAtCXSKop7dnBZ4zA4LUvGHBuF5uZR2EbDYwVnsIiy04P4Ktf7MFklpF8Yp8HaX6nI29UrAtBiei9IuV2nnKR2NJPqBDK03SmiSsymnVkm6ERgNhF6WVzWTRe87AycYVkUjjfsOzh+YDEoFDidgJwL7Nous3lnsPNS1NSI0uyfa6JcJgNaAoacJAXE8WBWNkunBod0q3msnwDTJdyPq43CkUhUyb5uF8PPTYe5kbSarsehNDOgumk0ltw8vEsuR4mAeYoG4GS5MrEBenax9g/3kB/YeE+WlUiy2QHzUCGE1zJ1kWzom/ktQXKnSPMFztMRTGcALL5nMJpsEUVlyL93XnhOll5fUnB20wD2y4eyyNJWFYBeiefHJ24+Dpz7TT4ViCl48MCpBbld8tt+/riy4502qCTemWIEokGkkQP7InzZ52GggB2GYHKNOfIGc6MuNajaSqjqVs+/frqagAMrlZTqk0VvOR6OJJVt1Rhr/VZyLJzgHOCrXQLs4jzh8GYjV0qlZNDiWE5TbKvZONL0AJe0dF68Kx6rjqzAOFktKBEttJlHnQVC3Iduo8hFgONLvS424HSBpDs/iSzq6mEaOhslF2/3NZR5EEy9aWUH5cD2mPS85qIueBagZePLLSfLjVYQuh3LoXsdyDL0bYb5wxmrpBGoplRUaNBl/CpiBUH2UeSOpkgagkX2ASZTw0IpdE6ltzBrLTPpjrRlTJXGXOhrk5gKs/MJwxIEZzUspGVoGBa7qp7x3f129w+8WuzAGLM3cBqEeoJQ0QeEBiM+QKdapIp5U5N9uO01QmKeE3+W+FqKXtZrgxZ4M0b5kg4jSsoIFooCdbDDCWzCicJITL99lPev7n9zLDLSCPuPcAOCyw3/BYtz++RYjlLhan7wTIdwOa2gQN0VCiAhlavwZDkrSw6iOYVrtYk0PEan4h5bx2g2NINLdWWrFvVJmBlWSmMtV9JOoDXLaPsRZc4azJeyITLmZdIMPJZDboZntJD56dBC9Pr3a0Vya9Bl5WrJ2D8ZEngWOFGKPR0to3wEA7OFbkimEODWdKEtlS1IaGbzAPiWSqgBsKHIvOn3Zky1AczpD5EDKMeh4OazKAqM77cb5GgEijoirLwgAV4MUjiLMHDry1BxSA/qV+egzjI5fWgFGoFHpGJEe6pFvfQUUclVajjEPLZl6OHpLBK5gvGYGwwJ5M4ljCKw0x9HW0wbnNEYhCm/lTwgU7fc8+A+mpLJTBW1iTbvvuJR68OIk4e/BRbeujEID+5W58COPDTwIVE8SwbObwWsSKs6lVCSx1RRSU4rWdZpXt5iBm4di68SHUb6BnDwuhxUBGP6c7Uq3FpmVryghOhIvNh3DuRnhAdk15SDPvMO6dAC9P4dF+PUoBEMrKjTA6dDH89CxwDIgxKJgTskSsrcxsUUFrJjLMna6+MOmWbfB2afFXDU6w9YsDeB8NJasGYSI2tZNmUw8C4cpqZ9nowvZZINmLua5qjuVurfLDHI/l6zEIgH6bn56NYv08ULEG5gCOocuDc+bUuUQF5m+B2dhV7vsIDdbrCc5/P5tYYwBDiaz+Mm3jCT0kO8NaTIVITVGjtJp3sI0LlHbMacw+L+frU88V4vzhGugBP+atfIwCYK/i4KfH4NeOwfmJ8K7FCFoLinDCLcoIwH6Gfeh+SIyZkXl0FvQwzjN+zLKQmoZuzQspTIFT3Z51BOWGdpCt0JiqCKSLFlwD7S4RF1u1uo/LL3/rvnwBkN6ygxttwk2OwBWbID8SITYLYZBCQen0Ywl85Kpkh8KtbAWvM5ZTCCNzOraekulLpi1Z2vlZlrQTUcNPHLqnVUtOJmRtrhwrIMwQl9vgcrtJ7Dw+2/f4aIDcpcjDFVNQsQbn12ph8CMBPVAWS5dCwZlOGjSUWtZJcRVFJBlijk1izmRycqGlgoqbe6DMcJakbMu6ktyf8swM7d5sNhseS3CYd981nv/4b9vjKAAHuGTjuFAHnLhHqeIzlUFD7jv/31+Jg5swUbXDIQmjv5I3+RV+bBpOsX7161GsH39FP+GrO/MP+Mt9dQn+YX/9H+DhDzGFXEnhAAAAAElFTkSuQmCC" alt="Voltia icon" />
+        <div>
+          <strong>Voltia</strong>
+          <span data-i18n="brandTagline">Red inteligente de carga EV</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle">☰</button>
+
+      <div class="nav-right" id="mobileNav">
+        <nav class="nav-links">
+          <a href="#solutions" data-i18n="navSolutions">Soluciones</a>
+          <a href="#platform" data-i18n="navPlatform">Plataforma</a>
+          <a href="#models" data-i18n="navModels">Modelos de negocio</a>
+          <a href="#how" data-i18n="navHow">Cómo funciona</a>
+          <a href="#contact" data-i18n="navContact">Contacto</a>
+        </nav>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="lang-switch">
+            <button type="button" class="active" data-lang="es">ES</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+          <a href="#contact" class="btn btn-primary" data-i18n="navCta">Solicitar propuesta</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow" data-i18n="heroEyebrow">Infraestructura + software + operación</div>
+          <h1 data-i18n="heroTitle">Convierte tu comercio en un <span class="accent">destino de carga EV</span></h1>
+          <p data-i18n="heroText">Voltia ayuda a los comercios a desplegar, operar y monetizar estaciones de carga para vehículos eléctricos con una plataforma moderna que incluye instalación, operación OCPP, pagos, analítica, soporte y herramientas para comercios.</p>
+          <div class="hero-actions">
+            <a href="#contact" class="btn btn-primary" data-i18n="heroPrimary">Solicitar propuesta comercial</a>
+            <a href="#platform" class="btn btn-outline" data-i18n="heroSecondary">Explorar la plataforma</a>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric"><strong data-i18n="metric1Num">Todo en uno</strong><span data-i18n="metric1Text">Infraestructura, software y soporte</span></div>
+            <div class="metric"><strong data-i18n="metric2Num">OCPP</strong><span data-i18n="metric2Text">Operación interoperable de cargadores</span></div>
+            <div class="metric"><strong data-i18n="metric3Num">B2B</strong><span data-i18n="metric3Text">Diseñado para comercios y propietarios</span></div>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="product-dashboard">
+            <div class="dashboard-topbar">
+              <div>
+                <span class="mini-label" data-i18n="dashboardLabel">Dashboard operativo en vivo</span>
+                <h3 data-i18n="dashboardTitle">Centro de Operaciones Voltia</h3>
+              </div>
+              <span class="live-badge" data-i18n="dashboardLive">En línea</span>
+            </div>
+
+            <div class="dashboard-stats">
+              <div class="stat-box"><span data-i18n="dashStat1Label">Cargadores activos</span><strong>24</strong></div>
+              <div class="stat-box"><span data-i18n="dashStat2Label">Sesiones hoy</span><strong>148</strong></div>
+              <div class="stat-box"><span data-i18n="dashStat3Label">Disponibilidad</span><strong>96%</strong></div>
+            </div>
+
+            <div class="dashboard-grid">
+              <div class="dashboard-card">
+                <h3 data-i18n="panel1Title">Visión de la red</h3>
+                <p data-i18n="panel1Text">Monitorea disponibilidad, sesiones, pagos y salud de cargadores desde un solo lugar.</p>
+                <div class="map-box" aria-hidden="true">
+                  <span class="pin"></span><span class="pin"></span><span class="pin"></span><span class="pin"></span>
+                </div>
+              </div>
+
+              <div style="display:grid; gap:14px;">
+                <div class="mini-card">
+                  <h3 data-i18n="panel2Title">Portal para comercios</h3>
+                  <div class="list">
+                    <div class="item"><span><span class="dot"></span><span data-i18n="panel2Item1">Seguimiento de ingresos</span></span><span class="status-ok">✓</span></div>
+                    <div class="item"><span><span class="dot"></span><span data-i18n="panel2Item2">Reportes de uso</span></span><span class="status-ok">✓</span></div>
+                    <div class="item"><span><span class="dot"></span><span data-i18n="panel2Item3">Gestión de tarifas</span></span><span class="status-ok">✓</span></div>
+                  </div>
+                </div>
+                <div class="mini-card">
+                  <h3 data-i18n="panel3Title">Experiencia del conductor</h3>
+                  <div class="list">
+                    <div class="item"><span><span class="dot"></span><span data-i18n="panel3Item1">Buscar cargadores disponibles</span></span><span class="status-ok">Live</span></div>
+                    <div class="item"><span><span class="dot"></span><span data-i18n="panel3Item2">Iniciar, pagar y ver historial</span></span><span class="status-ok">App</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="solutions">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="solutionsTitle">Lo que entrega Voltia</h2>
+          <p data-i18n="solutionsText">No solo vendemos cargadores. Ofrecemos un ecosistema completo de carga eléctrica para comercios, propiedades comerciales y operadores.</p>
+        </div>
+        <div class="cards">
+          <article class="card"><div class="icon-badge">⚡</div><h3 data-i18n="card1Title">Infraestructura de carga</h3><p data-i18n="card1Text">Selección de hardware, dimensionamiento y despliegue según tu ubicación y demanda esperada.</p></article>
+          <article class="card"><div class="icon-badge">🛠</div><h3 data-i18n="card2Title">Instalación y puesta en marcha</h3><p data-i18n="card2Text">Visita técnica, obra eléctrica, activación e incorporación de cargadores con un proceso ágil.</p></article>
+          <article class="card"><div class="icon-badge">☁</div><h3 data-i18n="card3Title">Plataforma tecnológica</h3><p data-i18n="card3Text">Herramientas en la nube para monitoreo, operación OCPP, pagos, precios y analítica.</p></article>
+          <article class="card"><div class="icon-badge">📊</div><h3 data-i18n="card4Title">Soporte y analítica</h3><p data-i18n="card4Text">Reportería, métricas para comercios, soporte proactivo, mantenimiento y optimización del negocio.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="platform">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="platformTitle">Una plataforma pensada para la operación de carga inteligente</h2>
+          <p data-i18n="platformText">Voltia conecta estaciones de carga, conductores, comercios y operadores en un ecosistema integrado.</p>
+        </div>
+        <div class="split">
+          <div class="platform-box">
+            <h3 data-i18n="platformBoxTitle">Capacidades principales de la plataforma</h3>
+            <p data-i18n="platformBoxText">Desde pagos y monitoreo hasta reportes para comercios, Voltia te da visibilidad operativa y control comercial.</p>
+            <div class="platform-list">
+              <div class="pill" data-i18n="pill1">Gestión OCPP de cargadores</div>
+              <div class="pill" data-i18n="pill2">App móvil para conductores</div>
+              <div class="pill" data-i18n="pill3">Portal web para comercios</div>
+              <div class="pill" data-i18n="pill4">Pagos y tarifas</div>
+              <div class="pill" data-i18n="pill5">Reportes y analítica</div>
+              <div class="pill" data-i18n="pill6">Alertas y soporte</div>
+            </div>
+          </div>
+          <div class="platform-box">
+            <h3 data-i18n="platformBox2Title">Ideal para múltiples tipos de negocio</h3>
+            <p data-i18n="platformBox2Text">Ya sea retail, hotelería, oficentros, parqueos u operaciones de flotilla, Voltia se adapta a tu modelo.</p>
+            <div class="platform-list">
+              <div class="pill" data-i18n="sol1Title">Retail y centros comerciales</div>
+              <div class="pill" data-i18n="sol2Title">Hoteles y hospitalidad</div>
+              <div class="pill" data-i18n="sol3Title">Parqueos y flotillas</div>
+              <div class="pill" data-i18n="sol4Title">Oficentros y propiedades</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="models">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="modelsTitle">Modelos de negocio flexibles</h2>
+          <p data-i18n="modelsText">Elige la estructura que mejor se adapte a tu estrategia de inversión y operación.</p>
+        </div>
+        <div class="models">
+          <article class="model"><strong>01</strong><h3 data-i18n="model1Title">Cargador + plataforma</h3><p data-i18n="model1Text">El cliente adquiere el hardware y se suscribe a Voltia para usar la plataforma y la operación.</p></article>
+          <article class="model"><strong>02</strong><h3 data-i18n="model2Title">Revenue share</h3><p data-i18n="model2Text">Voltia participa del modelo de ingresos por carga mientras ayuda al comercio a atraer nuevos clientes.</p></article>
+          <article class="model"><strong>03</strong><h3 data-i18n="model3Title">Operación como servicio</h3><p data-i18n="model3Text">¿Ya tienes cargadores? Operamos el software, pagos, monitoreo y soporte de tu red.</p></article>
+          <article class="model"><strong>04</strong><h3 data-i18n="model4Title">Plataforma marca blanca</h3><p data-i18n="model4Text">Usa la tecnología de Voltia bajo tu propia marca para escalar tu ecosistema de carga.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="howTitle">Cómo funciona</h2>
+          <p data-i18n="howText">Un proceso simple desde la evaluación hasta el lanzamiento y la monetización.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><div class="num">1</div><h3 data-i18n="step1Title">Evaluación del sitio</h3><p data-i18n="step1Text">Analizamos tu ubicación, flujo de parqueo, capacidad eléctrica y potencial de demanda.</p></article>
+          <article class="step"><div class="num">2</div><h3 data-i18n="step2Title">Despliegue</h3><p data-i18n="step2Text">Instalamos la infraestructura de carga y realizamos la puesta en marcha del equipo.</p></article>
+          <article class="step"><div class="num">3</div><h3 data-i18n="step3Title">Activación de plataforma</h3><p data-i18n="step3Text">Conectamos los cargadores al ecosistema Voltia, pagos y monitoreo operativo.</p></article>
+          <article class="step"><div class="num">4</div><h3 data-i18n="step4Title">Lanzamiento y monetización</h3><p data-i18n="step4Text">Tu negocio empieza a atender conductores EV y a visualizar uso e ingresos.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="benefitsTitle">Beneficios para comercios y conductores</h2>
+          <p data-i18n="benefitsText">Voltia crea valor tanto para el negocio como para el cliente final.</p>
+        </div>
+        <div class="benefits">
+          <div class="benefit-box">
+            <h3 data-i18n="benefit1Title">Para comercios</h3>
+            <ul class="checklist">
+              <li data-i18n="benefit1Item1">Crear una nueva fuente de ingresos.</li>
+              <li data-i18n="benefit1Item2">Aumentar tráfico y tiempo de permanencia.</li>
+              <li data-i18n="benefit1Item3">Mejorar el posicionamiento sostenible.</li>
+              <li data-i18n="benefit1Item4">Operar sin desarrollar tecnología propia.</li>
+              <li data-i18n="benefit1Item5">Acceder a reportes, tarifas y soporte.</li>
+            </ul>
+          </div>
+          <div class="benefit-box">
+            <h3 data-i18n="benefit2Title">Para conductores</h3>
+            <ul class="checklist">
+              <li data-i18n="benefit2Item1">Encontrar puntos de carga disponibles fácilmente.</li>
+              <li data-i18n="benefit2Item2">Iniciar y detener la carga desde la app.</li>
+              <li data-i18n="benefit2Item3">Pagar digitalmente y revisar historial.</li>
+              <li data-i18n="benefit2Item4">Disfrutar una experiencia de carga más simple y confiable.</li>
+              <li data-i18n="benefit2Item5">Acceder a una red de carga inteligente en crecimiento.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="contact">
+      <div class="container">
+        <div class="cta-card">
+          <div class="cta-side">
+            <h2 data-i18n="ctaTitle">Construyamos tu oferta de carga EV</h2>
+            <p data-i18n="ctaText">Cuéntanos sobre tu negocio y ubicación. Te ayudamos a evaluar el mejor modelo, infraestructura y configuración tecnológica.</p>
+            <a href="#contactForm" class="btn btn-primary" data-i18n="ctaButton">Solicitar evaluación</a>
+          </div>
+          <form class="contact-form" id="contactForm">
+            <div class="form-grid">
+              <div class="field"><label data-i18n="formName">Nombre</label><input type="text" /></div>
+              <div class="field"><label data-i18n="formCompany">Empresa</label><input type="text" /></div>
+              <div class="field"><label data-i18n="formEmail">Correo electrónico</label><input type="email" /></div>
+              <div class="field"><label data-i18n="formPhone">Teléfono</label><input type="text" /></div>
+              <div class="field"><label data-i18n="formType">Tipo de negocio</label><select><option data-i18n="formTypeOpt1">Selecciona una opción</option><option data-i18n="formTypeOpt2">Retail / Centro comercial</option><option data-i18n="formTypeOpt3">Hotel / Hospitalidad</option><option data-i18n="formTypeOpt4">Parqueo / Inmobiliario</option><option data-i18n="formTypeOpt5">Corporativo / Flotilla</option></select></div>
+              <div class="field"><label data-i18n="formLocation">Ubicación</label><input type="text" /></div>
+              <div class="field full"><label data-i18n="formMessage">Mensaje</label><textarea></textarea></div>
+              <div class="field full"><button type="submit" class="btn btn-primary" data-i18n="formButton">Enviar solicitud</button></div>
+            </div>
+            <p class="form-note" data-i18n="formNote">Formulario demo. Luego se puede conectar a correo, CRM o WhatsApp.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer">
+      <div class="footer-brand">
+        <img src="data:image/png;base64,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" alt="Voltia icon" />
+        <div><strong>Voltia</strong><div data-i18n="footerTagline">Red inteligente de carga EV</div></div>
+      </div>
+      <div data-i18n="footerCopy">© 2026 Voltia. Diseñado para infraestructura, software y operación de carga eléctrica.</div>
+    </div>
+  </footer>
+
+  <script>
+    const translations = {
+      es: {
+        brandTagline:'Red inteligente de carga EV', navSolutions:'Soluciones', navPlatform:'Plataforma', navModels:'Modelos de negocio', navHow:'Cómo funciona', navContact:'Contacto', navCta:'Solicitar propuesta',
+        heroEyebrow:'Infraestructura + software + operación', heroTitle:'Convierte tu comercio en un <span class="accent">destino de carga EV</span>', heroText:'Voltia ayuda a los comercios a desplegar, operar y monetizar estaciones de carga para vehículos eléctricos con una plataforma moderna que incluye instalación, operación OCPP, pagos, analítica, soporte y herramientas para comercios.', heroPrimary:'Solicitar propuesta comercial', heroSecondary:'Explorar la plataforma',
+        metric1Num:'Todo en uno', metric1Text:'Infraestructura, software y soporte', metric2Num:'OCPP', metric2Text:'Operación interoperable de cargadores', metric3Num:'B2B', metric3Text:'Diseñado para comercios y propietarios',
+        dashboardLabel:'Dashboard operativo en vivo', dashboardTitle:'Centro de Operaciones Voltia', dashboardLive:'En línea', dashStat1Label:'Cargadores activos', dashStat2Label:'Sesiones hoy', dashStat3Label:'Disponibilidad',
+        panel1Title:'Visión de la red', panel1Text:'Monitorea disponibilidad, sesiones, pagos y salud de cargadores desde un solo lugar.', panel2Title:'Portal para comercios', panel2Item1:'Seguimiento de ingresos', panel2Item2:'Reportes de uso', panel2Item3:'Gestión de tarifas', panel3Title:'Experiencia del conductor', panel3Item1:'Buscar cargadores disponibles', panel3Item2:'Iniciar, pagar y ver historial',
+        solutionsTitle:'Lo que entrega Voltia', solutionsText:'No solo vendemos cargadores. Ofrecemos un ecosistema completo de carga eléctrica para comercios, propiedades comerciales y operadores.', card1Title:'Infraestructura de carga', card1Text:'Selección de hardware, dimensionamiento y despliegue según tu ubicación y demanda esperada.', card2Title:'Instalación y puesta en marcha', card2Text:'Visita técnica, obra eléctrica, activación e incorporación de cargadores con un proceso ágil.', card3Title:'Plataforma tecnológica', card3Text:'Herramientas en la nube para monitoreo, operación OCPP, pagos, precios y analítica.', card4Title:'Soporte y analítica', card4Text:'Reportería, métricas para comercios, soporte proactivo, mantenimiento y optimización del negocio.',
+        platformTitle:'Una plataforma pensada para la operación de carga inteligente', platformText:'Voltia conecta estaciones de carga, conductores, comercios y operadores en un ecosistema integrado.', platformBoxTitle:'Capacidades principales de la plataforma', platformBoxText:'Desde pagos y monitoreo hasta reportes para comercios, Voltia te da visibilidad operativa y control comercial.', pill1:'Gestión OCPP de cargadores', pill2:'App móvil para conductores', pill3:'Portal web para comercios', pill4:'Pagos y tarifas', pill5:'Reportes y analítica', pill6:'Alertas y soporte', platformBox2Title:'Ideal para múltiples tipos de negocio', platformBox2Text:'Ya sea retail, hotelería, oficentros, parqueos u operaciones de flotilla, Voltia se adapta a tu modelo.', sol1Title:'Retail y centros comerciales', sol2Title:'Hoteles y hospitalidad', sol3Title:'Parqueos y flotillas', sol4Title:'Oficentros y propiedades',
+        modelsTitle:'Modelos de negocio flexibles', modelsText:'Elige la estructura que mejor se adapte a tu estrategia de inversión y operación.', model1Title:'Cargador + plataforma', model1Text:'El cliente adquiere el hardware y se suscribe a Voltia para usar la plataforma y la operación.', model2Title:'Revenue share', model2Text:'Voltia participa del modelo de ingresos por carga mientras ayuda al comercio a atraer nuevos clientes.', model3Title:'Operación como servicio', model3Text:'¿Ya tienes cargadores? Operamos el software, pagos, monitoreo y soporte de tu red.', model4Title:'Plataforma marca blanca', model4Text:'Usa la tecnología de Voltia bajo tu propia marca para escalar tu ecosistema de carga.',
+        howTitle:'Cómo funciona', howText:'Un proceso simple desde la evaluación hasta el lanzamiento y la monetización.', step1Title:'Evaluación del sitio', step1Text:'Analizamos tu ubicación, flujo de parqueo, capacidad eléctrica y potencial de demanda.', step2Title:'Despliegue', step2Text:'Instalamos la infraestructura de carga y realizamos la puesta en marcha del equipo.', step3Title:'Activación de plataforma', step3Text:'Conectamos los cargadores al ecosistema Voltia, pagos y monitoreo operativo.', step4Title:'Lanzamiento y monetización', step4Text:'Tu negocio empieza a atender conductores EV y a visualizar uso e ingresos.',
+        benefitsTitle:'Beneficios para comercios y conductores', benefitsText:'Voltia crea valor tanto para el negocio como para el cliente final.', benefit1Title:'Para comercios', benefit1Item1:'Crear una nueva fuente de ingresos.', benefit1Item2:'Aumentar tráfico y tiempo de permanencia.', benefit1Item3:'Mejorar el posicionamiento sostenible.', benefit1Item4:'Operar sin desarrollar tecnología propia.', benefit1Item5:'Acceder a reportes, tarifas y soporte.', benefit2Title:'Para conductores', benefit2Item1:'Encontrar puntos de carga disponibles fácilmente.', benefit2Item2:'Iniciar y detener la carga desde la app.', benefit2Item3:'Pagar digitalmente y revisar historial.', benefit2Item4:'Disfrutar una experiencia de carga más simple y confiable.', benefit2Item5:'Acceder a una red de carga inteligente en crecimiento.',
+        ctaTitle:'Construyamos tu oferta de carga EV', ctaText:'Cuéntanos sobre tu negocio y ubicación. Te ayudamos a evaluar el mejor modelo, infraestructura y configuración tecnológica.', ctaButton:'Solicitar evaluación', formName:'Nombre', formCompany:'Empresa', formEmail:'Correo electrónico', formPhone:'Teléfono', formType:'Tipo de negocio', formTypeOpt1:'Selecciona una opción', formTypeOpt2:'Retail / Centro comercial', formTypeOpt3:'Hotel / Hospitalidad', formTypeOpt4:'Parqueo / Inmobiliario', formTypeOpt5:'Corporativo / Flotilla', formLocation:'Ubicación', formMessage:'Mensaje', formButton:'Enviar solicitud', formNote:'Formulario demo. Luego se puede conectar a correo, CRM o WhatsApp.', footerTagline:'Red inteligente de carga EV', footerCopy:'© 2026 Voltia. Diseñado para infraestructura, software y operación de carga eléctrica.'
+      },
+      en: {
+        brandTagline:'Smart EV Charging Network', navSolutions:'Solutions', navPlatform:'Platform', navModels:'Business Models', navHow:'How It Works', navContact:'Contact', navCta:'Request proposal',
+        heroEyebrow:'Infrastructure + software + operations', heroTitle:'Turn your business into an <span class="accent">EV charging destination</span>', heroText:'Voltia helps businesses deploy, operate and monetize electric vehicle charging stations through a modern platform that includes installation, OCPP operation, payments, analytics, support and merchant tools.', heroPrimary:'Request commercial proposal', heroSecondary:'Explore the platform',
+        metric1Num:'All-in-one', metric1Text:'Infrastructure, software and support', metric2Num:'OCPP', metric2Text:'Interoperable charger operation', metric3Num:'B2B', metric3Text:'Designed for businesses and property owners',
+        dashboardLabel:'Live charging dashboard', dashboardTitle:'Voltia Operations Center', dashboardLive:'Live', dashStat1Label:'Active chargers', dashStat2Label:'Sessions today', dashStat3Label:'Availability',
+        panel1Title:'Network overview', panel1Text:'Monitor availability, sessions, payments and charger health from one place.', panel2Title:'Merchant portal', panel2Item1:'Revenue tracking', panel2Item2:'Usage reports', panel2Item3:'Tariff management', panel3Title:'Driver experience', panel3Item1:'Find available chargers', panel3Item2:'Start, pay and view history',
+        solutionsTitle:'What Voltia delivers', solutionsText:'We are not just selling chargers. We provide a complete EV charging ecosystem for businesses, commercial properties and operators.', card1Title:'Charging infrastructure', card1Text:'Hardware sourcing, sizing and deployment aligned to your location and expected demand.', card2Title:'Installation & commissioning', card2Text:'Site review, electrical work, activation and charger onboarding with a smooth launch process.', card3Title:'Technology platform', card3Text:'Cloud-based tools for monitoring, OCPP operations, payments, pricing and analytics.', card4Title:'Support & analytics', card4Text:'Reporting, merchant insights, proactive support, maintenance and business optimization.',
+        platformTitle:'A platform built for smart charging operations', platformText:'Voltia connects charging stations, drivers, merchants and operators in one integrated ecosystem.', platformBoxTitle:'Core platform capabilities', platformBoxText:'From payments and monitoring to merchant reporting, Voltia gives you operational visibility and commercial control.', pill1:'OCPP charger management', pill2:'Mobile app for drivers', pill3:'Merchant web portal', pill4:'Payments & tariffs', pill5:'Reports & analytics', pill6:'Alerts & support workflows', platformBox2Title:'Best fit for multiple business types', platformBox2Text:'Whether you are a retailer, hotel, office complex, parking operator or fleet business, Voltia adapts to your business model.', sol1Title:'Retail & shopping', sol2Title:'Hotels & hospitality', sol3Title:'Parking & fleets', sol4Title:'Office complexes & properties',
+        modelsTitle:'Flexible business models', modelsText:'Choose the structure that best fits your investment strategy and operational needs.', model1Title:'Hardware + platform', model1Text:'The client acquires the charging hardware and subscribes to Voltia for platform access and operations.', model2Title:'Revenue share', model2Text:'Voltia participates in the charging revenue model while enabling the business to attract new EV customers.', model3Title:'Operation as a service', model3Text:'Already have chargers? We can operate the software, payments, monitoring and support for your network.', model4Title:'White-label platform', model4Text:'Use Voltia technology under your own brand for a scalable charging ecosystem.',
+        howTitle:'How it works', howText:'A simple process from evaluation to launch and monetization.', step1Title:'Site assessment', step1Text:'We evaluate your location, parking flow, electrical capacity and demand potential.', step2Title:'Deployment', step2Text:'We install the charging infrastructure and commission the equipment.', step3Title:'Platform activation', step3Text:'We connect chargers to the Voltia ecosystem, payments and operational monitoring.', step4Title:'Go live & monetize', step4Text:'Your business starts serving EV drivers while tracking usage and revenue.',
+        benefitsTitle:'Benefits for merchants and drivers', benefitsText:'Voltia creates value for both the business and the end customer.', benefit1Title:'For merchants', benefit1Item1:'Create a new revenue stream.', benefit1Item2:'Increase traffic and customer dwell time.', benefit1Item3:'Improve sustainability positioning.', benefit1Item4:'Operate without building your own technology.', benefit1Item5:'Access reports, pricing tools and support.', benefit2Title:'For drivers', benefit2Item1:'Find available charging points easily.', benefit2Item2:'Start and stop charging from the app.', benefit2Item3:'Pay digitally and review charging history.', benefit2Item4:'Enjoy a smoother and more reliable charging experience.', benefit2Item5:'Access a growing smart charging network.',
+        ctaTitle:'Let’s build your EV charging offering', ctaText:'Tell us about your business and location. We can help you evaluate the best model, infrastructure and technology setup.', ctaButton:'Request evaluation', formName:'Name', formCompany:'Company', formEmail:'Email', formPhone:'Phone', formType:'Business type', formTypeOpt1:'Select an option', formTypeOpt2:'Retail / Shopping Center', formTypeOpt3:'Hotel / Hospitality', formTypeOpt4:'Parking / Real Estate', formTypeOpt5:'Corporate / Fleet', formLocation:'Location', formMessage:'Message', formButton:'Send request', formNote:'Demo form. You can later connect it to email, a CRM or WhatsApp.', footerTagline:'Smart EV Charging Network', footerCopy:'© 2026 Voltia. Designed for EV charging infrastructure, software and operations.'
+      }
+    };
+
+    const setLanguage = (lang) => {
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const value = translations[lang][el.dataset.i18n];
+        if (value) el.innerHTML = value;
+      });
+      document.querySelectorAll('[data-lang]').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+      localStorage.setItem('voltia_lang', lang);
+    };
+    setLanguage(localStorage.getItem('voltia_lang') || 'es');
+    document.querySelectorAll('[data-lang]').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    menuToggle.addEventListener('click', () => mobileNav.classList.toggle('open'));
+    mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileNav.classList.remove('open')));
+    document.getElementById('contactForm').addEventListener('submit', e => {
+      e.preventDefault();
+      alert(document.documentElement.lang === 'es' ? 'Formulario demo enviado. Luego se puede conectar a correo, CRM o WhatsApp.' : 'Demo form submitted. You can later connect it to email, a CRM or WhatsApp.');
+    });
+  </script>
+</body>
+</html>
